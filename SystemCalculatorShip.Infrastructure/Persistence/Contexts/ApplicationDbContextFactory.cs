@@ -12,7 +12,7 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
     {
         var connectionString =
             Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
-            ?? "Server=(localdb)\\MSSQLLocalDB;Database=SystemCalculatorShipDb;Trusted_Connection=True;TrustServerCertificate=True;";
+            ?? "Server=DESKTOP-7D52RUN;Database=SystemCalculatorShipDb;Trusted_Connection=True;TrustServerCertificate=True;";
 
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
         optionsBuilder.UseSqlServer(connectionString);
