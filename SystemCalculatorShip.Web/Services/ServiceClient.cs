@@ -1,7 +1,9 @@
 namespace SystemCalculatorShip.Web.Services;
 
 using Microsoft.JSInterop;
+using System.Net;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text.Json;
 using SystemCalculatorShip.Application.DTOs;
 
@@ -28,6 +30,7 @@ public class ServiceClient
     {
         try
         {
+            await LoadTokenAsync();
             using var request = new HttpRequestMessage(HttpMethod.Get, endpoint);
             AddAuthHeader(request);
 
@@ -48,6 +51,7 @@ public class ServiceClient
     {
         try
         {
+            await LoadTokenAsync();
             using var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
             request.Content = new StringContent(
                 JsonSerializer.Serialize(data),
@@ -57,6 +61,12 @@ public class ServiceClient
 
             var response = await _httpClient.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return CreateFallbackErrorResponse<TResponse>(response.StatusCode, content);
+            }
+
             return JsonSerializer.Deserialize<TResponse>(content, JsonOptions);
         }
         catch
@@ -69,6 +79,7 @@ public class ServiceClient
     {
         try
         {
+            await LoadTokenAsync();
             using var request = new HttpRequestMessage(HttpMethod.Put, endpoint);
             request.Content = new StringContent(
                 JsonSerializer.Serialize(data),
@@ -78,6 +89,12 @@ public class ServiceClient
 
             var response = await _httpClient.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return CreateFallbackErrorResponse<TResponse>(response.StatusCode, content);
+            }
+
             return JsonSerializer.Deserialize<TResponse>(content, JsonOptions);
         }
         catch
@@ -90,6 +107,7 @@ public class ServiceClient
     {
         try
         {
+            await LoadTokenAsync();
             using var request = new HttpRequestMessage(HttpMethod.Delete, endpoint);
             AddAuthHeader(request);
             await _httpClient.SendAsync(request);
@@ -104,11 +122,18 @@ public class ServiceClient
     {
         try
         {
+            await LoadTokenAsync();
             using var request = new HttpRequestMessage(HttpMethod.Delete, endpoint);
             AddAuthHeader(request);
 
             var response = await _httpClient.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return CreateFallbackErrorResponse<TResponse>(response.StatusCode, content);
+            }
+
             return JsonSerializer.Deserialize<TResponse>(content, JsonOptions);
         }
         catch
@@ -161,5 +186,36 @@ public class ServiceClient
         {
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
+    }
+
+    private static TResponse? CreateFallbackErrorResponse<TResponse>(HttpStatusCode statusCode, string content)
+    {
+        var responseType = typeof(TResponse);
+        if (!responseType.IsGenericType || responseType.GetGenericTypeDefinition() != typeof(ApiResponse<>))
+        {
+            return default;
+        }
+
+        var dataType = responseType.GetGenericArguments()[0];
+        var apiResponseType = typeof(ApiResponse<>).MakeGenericType(dataType);
+        var instance = Activator.CreateInstance(apiResponseType);
+        if (instance is null)
+        {
+            return default;
+        }
+
+        apiResponseType.GetProperty(nameof(ApiResponse<object>.Success), BindingFlags.Public | BindingFlags.Instance)
+            ?.SetValue(instance, false);
+
+        var fallbackMessage = statusCode == HttpStatusCode.Unauthorized
+            ? "No autorizado (401). Inicia sesion nuevamente en /login."
+            : !string.IsNullOrWhiteSpace(content)
+                ? content
+                : $"Request failed with status {(int)statusCode}.";
+
+        apiResponseType.GetProperty(nameof(ApiResponse<object>.Message), BindingFlags.Public | BindingFlags.Instance)
+            ?.SetValue(instance, fallbackMessage);
+
+        return (TResponse)instance;
     }
 }
