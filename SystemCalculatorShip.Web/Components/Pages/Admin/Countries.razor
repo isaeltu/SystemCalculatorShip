@@ -5,6 +5,16 @@
         <h5 class="card-title mb-0">Countries Management</h5>
     </div>
     <div class="card-body">
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div class="alert alert-success">@successMessage</div>
+        }
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger">@errorMessage</div>
+        }
+
         <button class="btn btn-success mb-3" @onclick="() => showCreateForm = !showCreateForm">
             @if (showCreateForm) { <span>✕ Cancel</span> } else { <span>+ Add Country</span> }
         </button>
@@ -59,11 +69,28 @@
                     {
                         <tr>
                             <td><strong>@country.Code</strong></td>
-                            <td>@country.Name</td>
+                            <td>
+                                @if (editingCountryId == country.Id)
+                                {
+                                    <InputText @bind-Value="editCountryName" class="form-control form-control-sm" />
+                                }
+                                else
+                                {
+                                    @country.Name
+                                }
+                            </td>
                             <td>N/A</td>
                             <td>
-                                <button class="btn btn-sm btn-warning" @onclick="() => EditCountry(country.Id)">Edit</button>
-                                <button class="btn btn-sm btn-danger" @onclick="() => DeleteCountry(country.Id)">Delete</button>
+                                @if (editingCountryId == country.Id)
+                                {
+                                    <button class="btn btn-sm btn-primary me-1" @onclick="SaveCountryEdit">Save</button>
+                                    <button class="btn btn-sm btn-secondary" @onclick="CancelCountryEdit">Cancel</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-sm btn-warning me-1" @onclick="() => EditCountry(country)">Edit</button>
+                                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteCountry(country.Id)">Delete</button>
+                                }
                             </td>
                         </tr>
                     }
@@ -80,6 +107,10 @@
     private List<CountryDto> countries = new();
     private CreateCountryRequest newCountry = new();
     private bool showCreateForm = false;
+    private int? editingCountryId;
+    private string editCountryName = string.Empty;
+    private string successMessage = string.Empty;
+    private string errorMessage = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -96,12 +127,17 @@
                 if (response?.Success == true && response.Data != null)
                 {
                     countries = response.Data.ToList();
+                    errorMessage = string.Empty;
+                }
+                else
+                {
+                    errorMessage = response?.Message ?? "No se pudieron cargar los paises.";
                 }
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading countries: {ex.Message}");
+            errorMessage = $"Error loading countries: {ex.Message}";
         }
     }
 
@@ -118,19 +154,65 @@
                 {
                     newCountry = new();
                     showCreateForm = false;
+                    successMessage = "Pais creado correctamente.";
+                    errorMessage = string.Empty;
                     await LoadCountries();
+                }
+                else
+                {
+                    errorMessage = response?.Message ?? "No se pudo crear el pais.";
                 }
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error creating country: {ex.Message}");
+            errorMessage = $"Error creating country: {ex.Message}";
         }
     }
 
-    private async Task EditCountry(int id)
+    private Task EditCountry(CountryDto country)
     {
-        // TODO: Implement edit functionality
+        editingCountryId = country.Id;
+        editCountryName = country.Name;
+        successMessage = string.Empty;
+        errorMessage = string.Empty;
+        return Task.CompletedTask;
+    }
+
+    private async Task SaveCountryEdit()
+    {
+        try
+        {
+            if (ApiClient == null || editingCountryId == null)
+                return;
+
+            var request = new UpdateCountryRequest { Name = editCountryName };
+            var response = await ApiClient.PutAsync<UpdateCountryRequest, ApiResponse<CountryDto>>(
+                $"/api/countries/{editingCountryId.Value}", request);
+
+            if (response?.Success == true)
+            {
+                successMessage = "Pais actualizado correctamente.";
+                errorMessage = string.Empty;
+                editingCountryId = null;
+                await LoadCountries();
+            }
+            else
+            {
+                errorMessage = response?.Message ?? "No se pudo actualizar el pais.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error updating country: {ex.Message}";
+        }
+    }
+
+    private Task CancelCountryEdit()
+    {
+        editingCountryId = null;
+        editCountryName = string.Empty;
+        return Task.CompletedTask;
     }
 
     private async Task DeleteCountry(int id)
@@ -139,13 +221,22 @@
         {
             if (ApiClient != null)
             {
-                await ApiClient.DeleteAsync($"/api/countries/{id}");
-                await LoadCountries();
+                var response = await ApiClient.DeleteAsync<ApiResponse<string>>($"/api/countries/{id}");
+                if (response?.Success == true)
+                {
+                    successMessage = "Pais eliminado correctamente.";
+                    errorMessage = string.Empty;
+                    await LoadCountries();
+                }
+                else
+                {
+                    errorMessage = response?.Message ?? "No se pudo eliminar el pais.";
+                }
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error deleting country: {ex.Message}");
+            errorMessage = $"Error deleting country: {ex.Message}";
         }
     }
 }

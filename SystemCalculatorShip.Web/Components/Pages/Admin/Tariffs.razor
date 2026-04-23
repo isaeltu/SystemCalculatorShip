@@ -5,6 +5,16 @@
         <h5 class="card-title mb-0">Tariffs Management</h5>
     </div>
     <div class="card-body">
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div class="alert alert-success">@successMessage</div>
+        }
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger">@errorMessage</div>
+        }
+
         <button class="btn btn-success mb-3" @onclick="() => showCreateForm = !showCreateForm">
             @if (showCreateForm) { <span>✕ Cancel</span> } else { <span>+ Add Tariff</span> }
         </button>
@@ -77,12 +87,43 @@
                     {
                         <tr>
                             <td>@tariff.CountryName</td>
-                            <td><span class="badge bg-info">@tariff.Type</span></td>
-                            <td>@tariff.RatePerKg.ToString("F2")</td>
+                            <td>
+                                @if (editingTariffId == tariff.Id)
+                                {
+                                    <InputSelect @bind-Value="editTariffType" class="form-select form-select-sm">
+                                        <option value="standard">Standard</option>
+                                        <option value="express">Express</option>
+                                        <option value="economy">Economy</option>
+                                        <option value="premium">Premium</option>
+                                    </InputSelect>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-info">@tariff.Type</span>
+                                }
+                            </td>
+                            <td>
+                                @if (editingTariffId == tariff.Id)
+                                {
+                                    <InputNumber @bind-Value="editTariffRatePerKg" class="form-control form-control-sm" />
+                                }
+                                else
+                                {
+                                    @tariff.RatePerKg.ToString("F2")
+                                }
+                            </td>
                             <td>@tariff.Currency</td>
                             <td>
-                                <button class="btn btn-sm btn-warning" @onclick="() => EditTariff(tariff.Id)">Edit</button>
-                                <button class="btn btn-sm btn-danger" @onclick="() => DeleteTariff(tariff.Id)">Delete</button>
+                                @if (editingTariffId == tariff.Id)
+                                {
+                                    <button class="btn btn-sm btn-primary me-1" @onclick="SaveTariffEdit">Save</button>
+                                    <button class="btn btn-sm btn-secondary" @onclick="CancelTariffEdit">Cancel</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-sm btn-warning me-1" @onclick="() => EditTariff(tariff)">Edit</button>
+                                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteTariff(tariff.Id)">Delete</button>
+                                }
                             </td>
                         </tr>
                     }
@@ -100,6 +141,11 @@
     private List<CountryDto> countries = new();
     private CreateTariffRequest newTariff = new();
     private bool showCreateForm = false;
+    private int? editingTariffId;
+    private string editTariffType = "standard";
+    private decimal? editTariffRatePerKg;
+    private string successMessage = string.Empty;
+    private string errorMessage = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -117,12 +163,17 @@
                 if (response?.Success == true && response.Data != null)
                 {
                     countries = response.Data.ToList();
+                    errorMessage = string.Empty;
+                }
+                else
+                {
+                    errorMessage = response?.Message ?? "No se pudieron cargar los paises.";
                 }
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading countries: {ex.Message}");
+            errorMessage = $"Error loading countries: {ex.Message}";
         }
     }
 
@@ -136,12 +187,17 @@
                 if (response?.Success == true && response.Data != null)
                 {
                     tariffs = response.Data.ToList();
+                    errorMessage = string.Empty;
+                }
+                else
+                {
+                    errorMessage = response?.Message ?? "No se pudieron cargar las tarifas. Verifica que el login este activo.";
                 }
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading tariffs: {ex.Message}");
+            errorMessage = $"Error loading tariffs: {ex.Message}";
         }
     }
 
@@ -158,19 +214,72 @@
                 {
                     newTariff = new();
                     showCreateForm = false;
+                    successMessage = "Tarifa creada correctamente.";
+                    errorMessage = string.Empty;
                     await LoadTariffs();
+                }
+                else
+                {
+                    errorMessage = response?.Message ?? "No se pudo crear la tarifa.";
                 }
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error creating tariff: {ex.Message}");
+            errorMessage = $"Error creating tariff: {ex.Message}";
         }
     }
 
-    private async Task EditTariff(int id)
+    private Task EditTariff(TariffDto tariff)
     {
-        // TODO: Implement edit functionality
+        editingTariffId = tariff.Id;
+        editTariffType = tariff.Type;
+        editTariffRatePerKg = tariff.RatePerKg;
+        successMessage = string.Empty;
+        errorMessage = string.Empty;
+        return Task.CompletedTask;
+    }
+
+    private async Task SaveTariffEdit()
+    {
+        try
+        {
+            if (ApiClient == null || editingTariffId == null || !editTariffRatePerKg.HasValue)
+                return;
+
+            var request = new UpdateTariffRequest
+            {
+                Type = editTariffType,
+                RatePerKg = editTariffRatePerKg.Value
+            };
+
+            var response = await ApiClient.PutAsync<UpdateTariffRequest, ApiResponse<TariffDto>>(
+                $"/api/tariffs/{editingTariffId.Value}", request);
+
+            if (response?.Success == true)
+            {
+                successMessage = "Tarifa actualizada correctamente.";
+                errorMessage = string.Empty;
+                editingTariffId = null;
+                await LoadTariffs();
+            }
+            else
+            {
+                errorMessage = response?.Message ?? "No se pudo actualizar la tarifa.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error updating tariff: {ex.Message}";
+        }
+    }
+
+    private Task CancelTariffEdit()
+    {
+        editingTariffId = null;
+        editTariffType = "standard";
+        editTariffRatePerKg = null;
+        return Task.CompletedTask;
     }
 
     private async Task DeleteTariff(int id)
@@ -179,13 +288,22 @@
         {
             if (ApiClient != null)
             {
-                await ApiClient.DeleteAsync($"/api/tariffs/{id}");
-                await LoadTariffs();
+                var response = await ApiClient.DeleteAsync<ApiResponse<string>>($"/api/tariffs/{id}");
+                if (response?.Success == true)
+                {
+                    successMessage = "Tarifa eliminada correctamente.";
+                    errorMessage = string.Empty;
+                    await LoadTariffs();
+                }
+                else
+                {
+                    errorMessage = response?.Message ?? "No se pudo eliminar la tarifa.";
+                }
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error deleting tariff: {ex.Message}");
+            errorMessage = $"Error deleting tariff: {ex.Message}";
         }
     }
 }

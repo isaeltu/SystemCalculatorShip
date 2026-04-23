@@ -97,6 +97,23 @@ public class ServiceClient
         }
     }
 
+    public async Task<TResponse?> DeleteAsync<TResponse>(string endpoint)
+    {
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Delete, endpoint);
+            AddAuthHeader(request);
+
+            var response = await _httpClient.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<TResponse>(content, JsonOptions);
+        }
+        catch
+        {
+            return default;
+        }
+    }
+
     public Task SetTokenAsync(string token)
     {
         _token = token;
