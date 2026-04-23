@@ -1,0 +1,6 @@
+@SystemCalculatorShip.Api_HostAddress = http://localhost:5232
+
+GET {{SystemCalculatorShip.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

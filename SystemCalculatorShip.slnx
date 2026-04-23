@@ -1,6 +1,13 @@
 <Solution>
   <Folder Name="/src/" />
-  <Folder Name="/src/core/" />
-  <Folder Name="/src/infrastructure/" />
-  <Folder Name="/src/presentation/" />
+  <Folder Name="/src/core/">
+    <Project Path="D:/c#class/DataStructure/Practice1/SystemCalculatorShip/SystemCalculatorShip.Application/SystemCalculatorShip.Application.csproj" />
+    <Project Path="D:/c#class/DataStructure/Practice1/SystemCalculatorShip/SystemCalculatorShip.Domain/SystemCalculatorShip.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/infrastructure/">
+    <Project Path="D:/c#class/DataStructure/Practice1/SystemCalculatorShip/SystemCalculatorShip.Infrastructure/SystemCalculatorShip.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/presentation/">
+    <Project Path="D:/c#class/DataStructure/Practice1/SystemCalculatorShip/SystemCalculatorShip.Api/SystemCalculatorShip.Api.csproj" />
+  </Folder>
 </Solution>
