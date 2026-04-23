@@ -1,4 +1,5 @@
 using SystemCalculatorShip.Web.Components;
+using SystemCalculatorShip.Web.Services;
 
 namespace SystemCalculatorShip.Web
 {
@@ -11,6 +12,14 @@ namespace SystemCalculatorShip.Web
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+
+            var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7000";
+            builder.Services.AddHttpClient("ApiClient", client =>
+            {
+                client.BaseAddress = new Uri(apiBaseUrl);
+            });
+            builder.Services.AddScoped<ServiceClient>(sp =>
+                new ServiceClient(sp.GetRequiredService<IHttpClientFactory>().CreateClient("ApiClient")));
 
             var app = builder.Build();
 

@@ -1,11 +1,11 @@
-namespace SystemCalculatorShip.Api.Services;
+namespace SystemCalculatorShip.Web.Services;
 
-using SystemCalculatorShip.Application.DTOs;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using SystemCalculatorShip.Application.DTOs;
 
 /// <summary>
-/// Service client for communicating with the API
+/// Service client for communicating with the API.
 /// </summary>
 public class ServiceClient
 {
@@ -15,7 +15,6 @@ public class ServiceClient
     public ServiceClient(HttpClient httpClient)
     {
         _httpClient = httpClient;
-        _token = null; // Would load from storage in real Blazor app
     }
 
     public async Task<T?> GetAsync<T>(string endpoint)
@@ -32,9 +31,8 @@ public class ServiceClient
             var content = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<T>(content);
         }
-        catch (Exception ex)
+        catch
         {
-            Console.WriteLine($"Error in GetAsync: {ex.Message}");
             return default;
         }
     }
@@ -54,9 +52,8 @@ public class ServiceClient
             var content = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<TResponse>(content);
         }
-        catch (Exception ex)
+        catch
         {
-            Console.WriteLine($"Error in PostAsync: {ex.Message}");
             return default;
         }
     }
@@ -76,9 +73,8 @@ public class ServiceClient
             var content = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<TResponse>(content);
         }
-        catch (Exception ex)
+        catch
         {
-            Console.WriteLine($"Error in PutAsync: {ex.Message}");
             return default;
         }
     }
@@ -89,25 +85,24 @@ public class ServiceClient
         {
             using var request = new HttpRequestMessage(HttpMethod.Delete, endpoint);
             AddAuthHeader(request);
-
             await _httpClient.SendAsync(request);
         }
-        catch (Exception ex)
+        catch
         {
-            Console.WriteLine($"Error in DeleteAsync: {ex.Message}");
+            // Ignore in demo client
         }
     }
 
-    public async Task SetTokenAsync(string token)
+    public Task SetTokenAsync(string token)
     {
         _token = token;
-        // In a real Blazor app, save to localStorage
+        return Task.CompletedTask;
     }
 
-    public async Task ClearTokenAsync()
+    public Task ClearTokenAsync()
     {
         _token = null;
-        // In a real Blazor app, remove from localStorage
+        return Task.CompletedTask;
     }
 
     private void AddAuthHeader(HttpRequestMessage request)

@@ -1,5 +1,4 @@
 @page "/admin"
-@using SystemCalculatorShip.Application.DTOs
 @inject NavigationManager Navigation
 @inject ServiceClient ApiClient
 
@@ -16,13 +15,13 @@
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
                     <button class="nav-link @(activeTab == "countries" ? "active" : "")" 
-                            @onclick="() => SetActiveTab("countries")" role="tab">
+                            @onclick='() => SetActiveTab("countries")' role="tab">
                         🌍 Countries
                     </button>
                 </li>
                 <li class="nav-item">
                     <button class="nav-link @(activeTab == "tariffs" ? "active" : "")" 
-                            @onclick="() => SetActiveTab("tariffs")" role="tab">
+                            @onclick='() => SetActiveTab("tariffs")' role="tab">
                         💰 Tariffs
                     </button>
                 </li>
