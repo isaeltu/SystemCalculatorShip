@@ -145,12 +145,14 @@ public class ServiceClient
     public async Task SetTokenAsync(string token)
     {
         _token = token;
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "auth_token", token);
     }
 
     public async Task ClearTokenAsync()
     {
         _token = null;
+        _httpClient.DefaultRequestHeaders.Authorization = null;
         await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "auth_token");
     }
 
@@ -165,6 +167,7 @@ public class ServiceClient
         if (!string.IsNullOrEmpty(token))
         {
             _token = token;
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 
         return !string.IsNullOrEmpty(_token);
@@ -178,6 +181,10 @@ public class ServiceClient
         }
 
         _token = await _jsRuntime.InvokeAsync<string?>("localStorage.getItem", "auth_token");
+        if (!string.IsNullOrEmpty(_token))
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+        }
     }
 
     private void AddAuthHeader(HttpRequestMessage request)
