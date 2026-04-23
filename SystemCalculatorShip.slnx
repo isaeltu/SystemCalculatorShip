@@ -9,5 +9,6 @@
   </Folder>
   <Folder Name="/src/presentation/">
     <Project Path="SystemCalculatorShip.Api/SystemCalculatorShip.Api.csproj" />
+    <Project Path="SystemCalculatorShip.Web/SystemCalculatorShip.Web.csproj" Id="b4750d5d-a4ed-4f1c-87aa-983544ad7cb7" />
   </Folder>
 </Solution>
