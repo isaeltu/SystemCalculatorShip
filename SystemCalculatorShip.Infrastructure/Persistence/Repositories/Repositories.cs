@@ -53,8 +53,7 @@ public class CountryRepository : ICountryRepository
         var country = await _context.Countries.FindAsync(id);
         if (country != null)
         {
-            country.IsActive = false;
-            _context.Countries.Update(country);
+            _context.Countries.Remove(country);
             await _context.SaveChangesAsync();
         }
     }
