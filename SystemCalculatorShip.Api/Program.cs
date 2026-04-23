@@ -29,11 +29,13 @@ builder.Services.AddCors(options =>
 });
 
 // Configure Database
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-    ?? "Server=(localdb)\\mssqllocaldb;Database=SystemCalculatorShipDb;Trusted_Connection=true;";
+var connectionString =
+    Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+    ?? builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? "Server=(localdb)\\MSSQLLocalDB;Database=SystemCalculatorShipDb;Trusted_Connection=True;TrustServerCertificate=True;";
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString, sql => sql.EnableRetryOnFailure()));
 
 // Configure JWT Authentication
 var secretKey = "your-secret-key-min-32-chars-long!";
@@ -72,6 +74,13 @@ builder.Services.AddScoped<ICountryManagementService, CountryManagementService>(
 builder.Services.AddScoped<ITariffManagementService, TariffManagementService>();
 
 var app = builder.Build();
+
+// Ensure database schema is created/updated on startup.
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())

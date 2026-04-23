@@ -76,11 +76,11 @@
             {
                 // Save token and redirect
                 await ApiClient.SetTokenAsync(response.Token);
-                Navigation.NavigateTo("/admin", forceLoad: true);
+                Navigation.NavigateTo("/admin");
             }
             else
             {
-                errorMessage = response?.Message ?? "Login failed. Please check your credentials.";
+                errorMessage = response?.Message ?? "Login failed. Verify API is running and credentials are correct.";
             }
         }
         catch (Exception ex)

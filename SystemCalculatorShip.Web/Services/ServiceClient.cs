@@ -11,6 +11,10 @@ public class ServiceClient
 {
     private readonly HttpClient _httpClient;
     private string? _token;
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     public ServiceClient(HttpClient httpClient)
     {
@@ -29,7 +33,7 @@ public class ServiceClient
                 return default;
 
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<T>(content);
+            return JsonSerializer.Deserialize<T>(content, JsonOptions);
         }
         catch
         {
@@ -50,7 +54,7 @@ public class ServiceClient
 
             var response = await _httpClient.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<TResponse>(content);
+            return JsonSerializer.Deserialize<TResponse>(content, JsonOptions);
         }
         catch
         {
@@ -71,7 +75,7 @@ public class ServiceClient
 
             var response = await _httpClient.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<TResponse>(content);
+            return JsonSerializer.Deserialize<TResponse>(content, JsonOptions);
         }
         catch
         {
