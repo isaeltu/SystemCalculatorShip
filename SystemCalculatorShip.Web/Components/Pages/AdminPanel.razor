@@ -1,8 +1,15 @@
 @page "/admin"
 @inject NavigationManager Navigation
 @inject ServiceClient ApiClient
+@inject IJSRuntime JSRuntime
 
 <div class="container-fluid mt-4">
+    @if (!isReady)
+    {
+        <div class="alert alert-info">Loading admin panel...</div>
+    }
+    else
+    {
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>📊 Admin Panel</h1>
         <button class="btn btn-outline-danger" @onclick="Logout">
@@ -39,28 +46,51 @@
             </div>
         </div>
     </div>
+    }
 </div>
 
 @code {
     private string activeTab = "countries";
+    private bool isReady;
+    private bool firstRenderCompleted;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var isAuthenticated = await ApiClient.IsAuthenticatedAsync();
-        if (!isAuthenticated)
+        if (!firstRender || firstRenderCompleted)
+        {
+            return;
+        }
+
+        firstRenderCompleted = true;
+
+        await ApiClient.LoadTokenAsync();
+
+        var storedTab = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", "admin_active_tab");
+        if (!string.IsNullOrWhiteSpace(storedTab))
+        {
+            activeTab = storedTab;
+        }
+
+        if (!await ApiClient.IsAuthenticatedAsync())
         {
             Navigation.NavigateTo("/login");
+            return;
         }
+
+        isReady = true;
+        StateHasChanged();
     }
 
-    private void SetActiveTab(string tab)
+    private async Task SetActiveTab(string tab)
     {
         activeTab = tab;
+        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "admin_active_tab", tab);
     }
 
     private async Task Logout()
     {
         await ApiClient.ClearTokenAsync();
+        await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "admin_active_tab");
         Navigation.NavigateTo("/", forceLoad: true);
     }
 }

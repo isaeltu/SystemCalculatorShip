@@ -580,15 +580,9 @@ Authorization: Bearer {token}
 
 ## 👥 Contribuyentes
 
-Este proyecto fue creado como demostración de arquitectura limpia en C#.
+Isael Capellan Valdez correo : isaelcapellanlite@gmail.com 
+Disponible para entrevistas
 
-## 📄 Licencia
-
-Este proyecto está bajo licencia MIT. Ver `LICENSE` file.
-
-## 📞 Soporte
-
-Para reportar bugs o sugerencias, por favor abrir un issue en el repositorio.
 
 ---
 

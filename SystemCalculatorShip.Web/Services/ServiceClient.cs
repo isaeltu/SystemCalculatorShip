@@ -1,6 +1,6 @@
 namespace SystemCalculatorShip.Web.Services;
 
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.JSInterop;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using SystemCalculatorShip.Application.DTOs;
@@ -11,28 +11,17 @@ using SystemCalculatorShip.Application.DTOs;
 public class ServiceClient
 {
     private readonly HttpClient _httpClient;
-    private readonly ProtectedLocalStorage _localStorage;
+    private readonly IJSRuntime _jsRuntime;
     private string? _token;
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
-    public ServiceClient(HttpClient httpClient, ProtectedLocalStorage localStorage)
+    public ServiceClient(HttpClient httpClient, IJSRuntime jsRuntime)
     {
         _httpClient = httpClient;
-        _localStorage = localStorage;
-    }
-
-    private async Task EnsureTokenLoadedAsync()
-    {
-        if (!string.IsNullOrEmpty(_token))
-        {
-            return;
-        }
-
-        var tokenResult = await _localStorage.GetAsync<string>("auth_token");
-        _token = tokenResult.Success ? tokenResult.Value : null;
+        _jsRuntime = jsRuntime;
     }
 
     public async Task<T?> GetAsync<T>(string endpoint)
@@ -40,7 +29,6 @@ public class ServiceClient
         try
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, endpoint);
-            await EnsureTokenLoadedAsync();
             AddAuthHeader(request);
 
             var response = await _httpClient.SendAsync(request);
@@ -65,7 +53,6 @@ public class ServiceClient
                 JsonSerializer.Serialize(data),
                 System.Text.Encoding.UTF8,
                 "application/json");
-            await EnsureTokenLoadedAsync();
             AddAuthHeader(request);
 
             var response = await _httpClient.SendAsync(request);
@@ -87,7 +74,6 @@ public class ServiceClient
                 JsonSerializer.Serialize(data),
                 System.Text.Encoding.UTF8,
                 "application/json");
-            await EnsureTokenLoadedAsync();
             AddAuthHeader(request);
 
             var response = await _httpClient.SendAsync(request);
@@ -105,7 +91,6 @@ public class ServiceClient
         try
         {
             using var request = new HttpRequestMessage(HttpMethod.Delete, endpoint);
-            await EnsureTokenLoadedAsync();
             AddAuthHeader(request);
             await _httpClient.SendAsync(request);
         }
@@ -120,7 +105,6 @@ public class ServiceClient
         try
         {
             using var request = new HttpRequestMessage(HttpMethod.Delete, endpoint);
-            await EnsureTokenLoadedAsync();
             AddAuthHeader(request);
 
             var response = await _httpClient.SendAsync(request);
@@ -136,19 +120,39 @@ public class ServiceClient
     public async Task SetTokenAsync(string token)
     {
         _token = token;
-        await _localStorage.SetAsync("auth_token", token);
+        await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "auth_token", token);
     }
 
     public async Task ClearTokenAsync()
     {
         _token = null;
-        await _localStorage.DeleteAsync("auth_token");
+        await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "auth_token");
     }
 
     public async Task<bool> IsAuthenticatedAsync()
     {
-        await EnsureTokenLoadedAsync();
+        if (!string.IsNullOrEmpty(_token))
+        {
+            return true;
+        }
+
+        var token = await _jsRuntime.InvokeAsync<string?>("localStorage.getItem", "auth_token");
+        if (!string.IsNullOrEmpty(token))
+        {
+            _token = token;
+        }
+
         return !string.IsNullOrEmpty(_token);
+    }
+
+    public async Task LoadTokenAsync()
+    {
+        if (!string.IsNullOrEmpty(_token))
+        {
+            return;
+        }
+
+        _token = await _jsRuntime.InvokeAsync<string?>("localStorage.getItem", "auth_token");
     }
 
     private void AddAuthHeader(HttpRequestMessage request)
