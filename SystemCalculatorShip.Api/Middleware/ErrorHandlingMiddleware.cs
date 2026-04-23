@@ -10,15 +10,14 @@ using System.Text.Json;
 public class ErrorHandlingMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly ILoggerService _logger;
 
-    public ErrorHandlingMiddleware(RequestDelegate next, ILoggerService logger)
+    public ErrorHandlingMiddleware(RequestDelegate next)
     {
         _next = next;
-        _logger = logger;
     }
 
-    public async Task InvokeAsync(HttpContext context)
+    // ILoggerService is now injected here
+    public async Task InvokeAsync(HttpContext context, ILoggerService logger)
     {
         try
         {
@@ -26,7 +25,7 @@ public class ErrorHandlingMiddleware
         }
         catch (Exception ex)
         {
-            _logger.Error("Unhandled exception", ex);
+            logger.Error("Unhandled exception", ex);
             await HandleExceptionAsync(context, ex);
         }
     }
