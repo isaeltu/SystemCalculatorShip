@@ -14,11 +14,16 @@ using SystemCalculatorShip.Domain.Entities;
 public class TariffsController : ControllerBase
 {
     private readonly ITariffManagementService _tariffService;
+    private readonly ICountryManagementService _countryService;
     private readonly ILoggerService _logger;
 
-    public TariffsController(ITariffManagementService tariffService, ILoggerService logger)
+    public TariffsController(
+        ITariffManagementService tariffService,
+        ICountryManagementService countryService,
+        ILoggerService logger)
     {
         _tariffService = tariffService;
+        _countryService = countryService;
         _logger = logger;
     }
 
@@ -59,11 +64,23 @@ public class TariffsController : ControllerBase
     {
         try
         {
-            // This would require a country lookup - simplified for now
+            var country = await _countryService.GetCountryByCodeAsync(countryCode);
+            if (country == null)
+            {
+                return NotFound(new ApiResponse<IEnumerable<TariffDto>>
+                {
+                    Success = false,
+                    Message = $"Country with code '{countryCode}' not found."
+                });
+            }
+
+            var tariffs = await _tariffService.GetTariffsByCountryAsync(country.Id);
+            var dtos = tariffs.Select(MapToDto);
+
             return Ok(new ApiResponse<IEnumerable<TariffDto>> 
             { 
                 Success = true, 
-                Data = new List<TariffDto>() 
+                Data = dtos 
             });
         }
         catch (Exception ex)

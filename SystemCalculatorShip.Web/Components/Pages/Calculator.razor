@@ -1,4 +1,5 @@
 @page "/calculator"
+@using System.Globalization
 @inject ServiceClient ApiClient
 
 <div class="container mt-5">
@@ -15,7 +16,7 @@
 
                         <div class="mb-3">
                             <label class="form-label">Destination Country</label>
-                            <InputSelect @bind-Value="calculateRequest.CountryCode" class="form-select">
+                            <InputSelect @bind-Value="calculateRequest.CountryCode" @bind-Value:after="LoadTariffsForSelectedCountry" class="form-select">
                                 <option value="">-- Select a country --</option>
                                 @foreach (var country in countries)
                                 {
@@ -35,13 +36,32 @@
                             <label class="form-label">Tariff Type</label>
                             <InputSelect @bind-Value="calculateRequest.TariffType" class="form-select">
                                 <option value="">-- Select tariff type --</option>
-                                <option value="standard">Standard - Regular delivery</option>
-                                <option value="express">Express - Fast delivery</option>
-                                <option value="economy">Economy - Budget delivery</option>
-                                <option value="premium">Premium - Priority delivery</option>
+                                @foreach (var tariff in tariffs)
+                                {
+                                    <option value="@tariff.Type">@FormatTariffLabel(tariff)</option>
+                                }
                             </InputSelect>
                             <ValidationMessage For="() => calculateRequest.TariffType" />
                         </div>
+
+                        @if (tariffs.Count > 0)
+                        {
+                            <div class="alert alert-info mb-3">
+                                <strong>Tariffs for @selectedCountryName:</strong>
+                                <ul class="mb-0 mt-2">
+                                    @foreach (var tariff in tariffs)
+                                    {
+                                        <li>@FormatTariffLabel(tariff)</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                        else if (!string.IsNullOrWhiteSpace(calculateRequest.CountryCode))
+                        {
+                            <div class="alert alert-warning mb-3">
+                                No tariffs were found for the selected country.
+                            </div>
+                        }
 
                         <button type="submit" class="btn btn-primary w-100" disabled="@isCalculating">
                             @if (isCalculating)
@@ -92,6 +112,8 @@
     private CalculateShippingRequest calculateRequest = new();
     private CalculateShippingResponse? result;
     private List<CountryDto> countries = new();
+    private List<TariffDto> tariffs = new();
+    private string selectedCountryName = string.Empty;
     private string errorMessage = string.Empty;
     private bool isCalculating = false;
 
@@ -114,6 +136,46 @@
         {
             errorMessage = $"Error loading countries: {ex.Message}";
         }
+    }
+
+    private async Task LoadTariffsForSelectedCountry()
+    {
+        tariffs = new List<TariffDto>();
+        selectedCountryName = string.Empty;
+        calculateRequest.TariffType = string.Empty;
+        result = null;
+
+        if (string.IsNullOrWhiteSpace(calculateRequest.CountryCode))
+        {
+            return;
+        }
+
+        var selectedCountry = countries.FirstOrDefault(c => c.Code.Equals(calculateRequest.CountryCode, StringComparison.OrdinalIgnoreCase));
+        selectedCountryName = selectedCountry?.Name ?? calculateRequest.CountryCode;
+
+        try
+        {
+            var response = await ApiClient.GetAsync<ApiResponse<IEnumerable<TariffDto>>>(
+                $"/api/tariffs/country/{calculateRequest.CountryCode}");
+
+            if (response?.Success == true && response.Data != null)
+            {
+                tariffs = response.Data.ToList();
+            }
+            else
+            {
+                errorMessage = response?.Message ?? "No tariffs available for this country.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading tariffs: {ex.Message}";
+        }
+    }
+
+    private static string FormatTariffLabel(TariffDto tariff)
+    {
+        return $"{CultureInfo.InvariantCulture.TextInfo.ToTitleCase(tariff.Type)} - {tariff.Currency} {tariff.RatePerKg:F2}/kg";
     }
 
     private async Task Calculate()

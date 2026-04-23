@@ -1,5 +1,6 @@
 namespace SystemCalculatorShip.Web.Services;
 
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using SystemCalculatorShip.Application.DTOs;
@@ -10,15 +11,28 @@ using SystemCalculatorShip.Application.DTOs;
 public class ServiceClient
 {
     private readonly HttpClient _httpClient;
+    private readonly ProtectedLocalStorage _localStorage;
     private string? _token;
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
-    public ServiceClient(HttpClient httpClient)
+    public ServiceClient(HttpClient httpClient, ProtectedLocalStorage localStorage)
     {
         _httpClient = httpClient;
+        _localStorage = localStorage;
+    }
+
+    private async Task EnsureTokenLoadedAsync()
+    {
+        if (!string.IsNullOrEmpty(_token))
+        {
+            return;
+        }
+
+        var tokenResult = await _localStorage.GetAsync<string>("auth_token");
+        _token = tokenResult.Success ? tokenResult.Value : null;
     }
 
     public async Task<T?> GetAsync<T>(string endpoint)
@@ -26,6 +40,7 @@ public class ServiceClient
         try
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, endpoint);
+            await EnsureTokenLoadedAsync();
             AddAuthHeader(request);
 
             var response = await _httpClient.SendAsync(request);
@@ -50,6 +65,7 @@ public class ServiceClient
                 JsonSerializer.Serialize(data),
                 System.Text.Encoding.UTF8,
                 "application/json");
+            await EnsureTokenLoadedAsync();
             AddAuthHeader(request);
 
             var response = await _httpClient.SendAsync(request);
@@ -71,6 +87,7 @@ public class ServiceClient
                 JsonSerializer.Serialize(data),
                 System.Text.Encoding.UTF8,
                 "application/json");
+            await EnsureTokenLoadedAsync();
             AddAuthHeader(request);
 
             var response = await _httpClient.SendAsync(request);
@@ -88,6 +105,7 @@ public class ServiceClient
         try
         {
             using var request = new HttpRequestMessage(HttpMethod.Delete, endpoint);
+            await EnsureTokenLoadedAsync();
             AddAuthHeader(request);
             await _httpClient.SendAsync(request);
         }
@@ -102,6 +120,7 @@ public class ServiceClient
         try
         {
             using var request = new HttpRequestMessage(HttpMethod.Delete, endpoint);
+            await EnsureTokenLoadedAsync();
             AddAuthHeader(request);
 
             var response = await _httpClient.SendAsync(request);
@@ -114,16 +133,22 @@ public class ServiceClient
         }
     }
 
-    public Task SetTokenAsync(string token)
+    public async Task SetTokenAsync(string token)
     {
         _token = token;
-        return Task.CompletedTask;
+        await _localStorage.SetAsync("auth_token", token);
     }
 
-    public Task ClearTokenAsync()
+    public async Task ClearTokenAsync()
     {
         _token = null;
-        return Task.CompletedTask;
+        await _localStorage.DeleteAsync("auth_token");
+    }
+
+    public async Task<bool> IsAuthenticatedAsync()
+    {
+        await EnsureTokenLoadedAsync();
+        return !string.IsNullOrEmpty(_token);
     }
 
     private void AddAuthHeader(HttpRequestMessage request)

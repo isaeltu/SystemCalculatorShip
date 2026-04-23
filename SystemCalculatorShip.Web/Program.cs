@@ -1,5 +1,6 @@
 using SystemCalculatorShip.Web.Components;
 using SystemCalculatorShip.Web.Services;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 namespace SystemCalculatorShip.Web
 {
@@ -13,13 +14,17 @@ namespace SystemCalculatorShip.Web
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
+            builder.Services.AddScoped<ProtectedLocalStorage>();
+
             var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5232";
             builder.Services.AddHttpClient("ApiClient", client =>
             {
                 client.BaseAddress = new Uri(apiBaseUrl);
             });
             builder.Services.AddScoped<ServiceClient>(sp =>
-                new ServiceClient(sp.GetRequiredService<IHttpClientFactory>().CreateClient("ApiClient")));
+                new ServiceClient(
+                    sp.GetRequiredService<IHttpClientFactory>().CreateClient("ApiClient"),
+                    sp.GetRequiredService<ProtectedLocalStorage>()));
 
             var app = builder.Build();
 

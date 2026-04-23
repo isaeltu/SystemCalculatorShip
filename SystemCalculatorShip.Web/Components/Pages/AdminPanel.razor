@@ -44,6 +44,15 @@
 @code {
     private string activeTab = "countries";
 
+    protected override async Task OnInitializedAsync()
+    {
+        var isAuthenticated = await ApiClient.IsAuthenticatedAsync();
+        if (!isAuthenticated)
+        {
+            Navigation.NavigateTo("/login");
+        }
+    }
+
     private void SetActiveTab(string tab)
     {
         activeTab = tab;
