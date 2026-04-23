@@ -13,7 +13,7 @@ namespace SystemCalculatorShip.Web
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
-            var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5232";
+            var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5332";
             builder.Services.AddHttpClient("ApiClient", client =>
             {
                 client.BaseAddress = new Uri(apiBaseUrl);
