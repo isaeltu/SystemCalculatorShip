@@ -67,13 +67,16 @@ public class ApplicationDbContext : DbContext
 
     private void SeedData(ModelBuilder modelBuilder)
     {
+        var seedCreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var seedUpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
         // Seed countries
         var countryId = 1;
         var countries = new[]
         {
-            new { Id = countryId++, Code = "IN", Name = "India", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow, IsActive = true },
-            new { Id = countryId++, Code = "US", Name = "United States", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow, IsActive = true },
-            new { Id = countryId++, Code = "GB", Name = "United Kingdom", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow, IsActive = true }
+            new { Id = countryId++, Code = "IN", Name = "India", CreatedAt = seedCreatedAt, UpdatedAt = seedUpdatedAt, IsActive = true },
+            new { Id = countryId++, Code = "US", Name = "United States", CreatedAt = seedCreatedAt, UpdatedAt = seedUpdatedAt, IsActive = true },
+            new { Id = countryId++, Code = "GB", Name = "United Kingdom", CreatedAt = seedCreatedAt, UpdatedAt = seedUpdatedAt, IsActive = true }
         };
 
         modelBuilder.Entity<Country>().HasData(
@@ -92,15 +95,15 @@ public class ApplicationDbContext : DbContext
         var tariffId = 1;
         var tariffs = new[]
         {
-            new { Id = tariffId++, CountryId = 1, Type = "standard", RatePerKg = 5m, Currency = "USD", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow, IsActive = true },
-            new { Id = tariffId++, CountryId = 1, Type = "express", RatePerKg = 7.50m, Currency = "USD", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow, IsActive = true },
-            new { Id = tariffId++, CountryId = 1, Type = "economy", RatePerKg = 3m, Currency = "USD", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow, IsActive = true },
-            new { Id = tariffId++, CountryId = 2, Type = "standard", RatePerKg = 8m, Currency = "USD", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow, IsActive = true },
-            new { Id = tariffId++, CountryId = 2, Type = "express", RatePerKg = 12m, Currency = "USD", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow, IsActive = true },
-            new { Id = tariffId++, CountryId = 2, Type = "economy", RatePerKg = 5m, Currency = "USD", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow, IsActive = true },
-            new { Id = tariffId++, CountryId = 3, Type = "standard", RatePerKg = 10m, Currency = "USD", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow, IsActive = true },
-            new { Id = tariffId++, CountryId = 3, Type = "express", RatePerKg = 15m, Currency = "USD", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow, IsActive = true },
-            new { Id = tariffId++, CountryId = 3, Type = "economy", RatePerKg = 6m, Currency = "USD", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow, IsActive = true }
+            new { Id = tariffId++, CountryId = 1, Type = "standard", RatePerKg = 5m, Currency = "USD", CreatedAt = seedCreatedAt, UpdatedAt = seedUpdatedAt, IsActive = true },
+            new { Id = tariffId++, CountryId = 1, Type = "express", RatePerKg = 7.50m, Currency = "USD", CreatedAt = seedCreatedAt, UpdatedAt = seedUpdatedAt, IsActive = true },
+            new { Id = tariffId++, CountryId = 1, Type = "economy", RatePerKg = 3m, Currency = "USD", CreatedAt = seedCreatedAt, UpdatedAt = seedUpdatedAt, IsActive = true },
+            new { Id = tariffId++, CountryId = 2, Type = "standard", RatePerKg = 8m, Currency = "USD", CreatedAt = seedCreatedAt, UpdatedAt = seedUpdatedAt, IsActive = true },
+            new { Id = tariffId++, CountryId = 2, Type = "express", RatePerKg = 12m, Currency = "USD", CreatedAt = seedCreatedAt, UpdatedAt = seedUpdatedAt, IsActive = true },
+            new { Id = tariffId++, CountryId = 2, Type = "economy", RatePerKg = 5m, Currency = "USD", CreatedAt = seedCreatedAt, UpdatedAt = seedUpdatedAt, IsActive = true },
+            new { Id = tariffId++, CountryId = 3, Type = "standard", RatePerKg = 10m, Currency = "USD", CreatedAt = seedCreatedAt, UpdatedAt = seedUpdatedAt, IsActive = true },
+            new { Id = tariffId++, CountryId = 3, Type = "express", RatePerKg = 15m, Currency = "USD", CreatedAt = seedCreatedAt, UpdatedAt = seedUpdatedAt, IsActive = true },
+            new { Id = tariffId++, CountryId = 3, Type = "economy", RatePerKg = 6m, Currency = "USD", CreatedAt = seedCreatedAt, UpdatedAt = seedUpdatedAt, IsActive = true }
         };
 
         modelBuilder.Entity<Tariff>().HasData(
