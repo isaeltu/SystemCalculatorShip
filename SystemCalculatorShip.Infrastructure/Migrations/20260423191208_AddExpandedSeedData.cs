@@ -13,47 +13,73 @@ namespace SystemCalculatorShip.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.InsertData(
-                table: "Countries",
-                columns: new[] { "Id", "Code", "CreatedAt", "IsActive", "Name", "UpdatedAt" },
-                values: new object[,]
-                {
-                    { 4, "CA", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, "Canada", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 5, "AU", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, "Australia", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 6, "DE", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, "Germany", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 7, "FR", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, "France", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 8, "JP", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, "Japan", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 9, "CN", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, "China", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 10, "SG", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, "Singapore", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
-                });
+            migrationBuilder.Sql(@"
+SET IDENTITY_INSERT dbo.Countries ON;
 
-            migrationBuilder.InsertData(
-                table: "Tariffs",
-                columns: new[] { "Id", "CountryId", "CreatedAt", "Currency", "IsActive", "RatePerKg", "Type", "UpdatedAt" },
-                values: new object[,]
-                {
-                    { 10, 4, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 9m, "standard", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 11, 4, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 13m, "express", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 12, 4, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 5.5m, "economy", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 13, 5, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 11m, "standard", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 14, 5, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 16m, "express", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 15, 5, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 7m, "economy", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 16, 6, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 8.5m, "standard", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 17, 6, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 12.5m, "express", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 18, 6, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 4.5m, "economy", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 19, 7, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 9.5m, "standard", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 20, 7, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 14m, "express", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 21, 7, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 5m, "economy", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 22, 8, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 10.5m, "standard", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 23, 8, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 15.5m, "express", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 24, 8, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 6m, "economy", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 25, 9, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 7m, "standard", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 26, 9, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 11m, "express", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 27, 9, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 4m, "economy", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 28, 10, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 12m, "standard", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 29, 10, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 17m, "express", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 30, 10, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "USD", true, 7.5m, "economy", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
-                });
+IF NOT EXISTS (SELECT 1 FROM dbo.Countries WHERE Id = 4)
+    INSERT INTO dbo.Countries (Id, Code, CreatedAt, IsActive, Name, UpdatedAt) VALUES (4, 'CA', '2024-01-01T00:00:00.0000000Z', 1, 'Canada', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Countries WHERE Id = 5)
+    INSERT INTO dbo.Countries (Id, Code, CreatedAt, IsActive, Name, UpdatedAt) VALUES (5, 'AU', '2024-01-01T00:00:00.0000000Z', 1, 'Australia', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Countries WHERE Id = 6)
+    INSERT INTO dbo.Countries (Id, Code, CreatedAt, IsActive, Name, UpdatedAt) VALUES (6, 'DE', '2024-01-01T00:00:00.0000000Z', 1, 'Germany', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Countries WHERE Id = 7)
+    INSERT INTO dbo.Countries (Id, Code, CreatedAt, IsActive, Name, UpdatedAt) VALUES (7, 'FR', '2024-01-01T00:00:00.0000000Z', 1, 'France', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Countries WHERE Id = 8)
+    INSERT INTO dbo.Countries (Id, Code, CreatedAt, IsActive, Name, UpdatedAt) VALUES (8, 'JP', '2024-01-01T00:00:00.0000000Z', 1, 'Japan', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Countries WHERE Id = 9)
+    INSERT INTO dbo.Countries (Id, Code, CreatedAt, IsActive, Name, UpdatedAt) VALUES (9, 'CN', '2024-01-01T00:00:00.0000000Z', 1, 'China', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Countries WHERE Id = 10)
+    INSERT INTO dbo.Countries (Id, Code, CreatedAt, IsActive, Name, UpdatedAt) VALUES (10, 'SG', '2024-01-01T00:00:00.0000000Z', 1, 'Singapore', '2024-01-01T00:00:00.0000000Z');
+
+SET IDENTITY_INSERT dbo.Countries OFF;
+
+SET IDENTITY_INSERT dbo.Tariffs ON;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 10)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (10, 4, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 9.0, 'standard', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 11)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (11, 4, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 13.0, 'express', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 12)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (12, 4, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 5.5, 'economy', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 13)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (13, 5, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 11.0, 'standard', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 14)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (14, 5, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 16.0, 'express', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 15)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (15, 5, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 7.0, 'economy', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 16)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (16, 6, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 8.5, 'standard', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 17)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (17, 6, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 12.5, 'express', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 18)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (18, 6, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 4.5, 'economy', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 19)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (19, 7, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 9.5, 'standard', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 20)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (20, 7, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 14.0, 'express', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 21)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (21, 7, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 5.0, 'economy', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 22)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (22, 8, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 10.5, 'standard', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 23)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (23, 8, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 15.5, 'express', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 24)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (24, 8, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 6.0, 'economy', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 25)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (25, 9, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 7.0, 'standard', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 26)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (26, 9, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 11.0, 'express', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 27)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (27, 9, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 4.0, 'economy', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 28)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (28, 10, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 12.0, 'standard', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 29)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (29, 10, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 17.0, 'express', '2024-01-01T00:00:00.0000000Z');
+IF NOT EXISTS (SELECT 1 FROM dbo.Tariffs WHERE Id = 30)
+    INSERT INTO dbo.Tariffs (Id, CountryId, CreatedAt, Currency, IsActive, RatePerKg, Type, UpdatedAt) VALUES (30, 10, '2024-01-01T00:00:00.0000000Z', 'USD', 1, 7.5, 'economy', '2024-01-01T00:00:00.0000000Z');
+
+SET IDENTITY_INSERT dbo.Tariffs OFF;
+" );
         }
 
         /// <inheritdoc />
