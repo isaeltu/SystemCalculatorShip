@@ -15,7 +15,7 @@
             <div class="alert alert-danger">@errorMessage</div>
         }
 
-        <button class="btn btn-success mb-3" @onclick="() => showCreateForm = !showCreateForm">
+        <button type="button" class="btn btn-success mb-3" @onclick="() => showCreateForm = !showCreateForm">
             @if (showCreateForm) { <span>✕ Cancel</span> } else { <span>+ Add Tariff</span> }
         </button>
 
@@ -116,13 +116,13 @@
                             <td>
                                 @if (editingTariffId == tariff.Id)
                                 {
-                                    <button class="btn btn-sm btn-primary me-1" @onclick="SaveTariffEdit">Save</button>
-                                    <button class="btn btn-sm btn-secondary" @onclick="CancelTariffEdit">Cancel</button>
+                                    <button type="button" class="btn btn-sm btn-primary me-1" @onclick="SaveTariffEdit">Save</button>
+                                    <button type="button" class="btn btn-sm btn-secondary" @onclick="CancelTariffEdit">Cancel</button>
                                 }
                                 else
                                 {
-                                    <button class="btn btn-sm btn-warning me-1" @onclick="() => EditTariff(tariff)">Edit</button>
-                                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteTariff(tariff.Id)">Delete</button>
+                                    <button type="button" class="btn btn-sm btn-warning me-1" @onclick="() => EditTariff(tariff)">Edit</button>
+                                    <button type="button" class="btn btn-sm btn-danger" @onclick="() => DeleteTariff(tariff.Id)">Delete</button>
                                 }
                             </td>
                         </tr>

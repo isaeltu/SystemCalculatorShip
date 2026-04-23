@@ -15,7 +15,7 @@
             <div class="alert alert-danger">@errorMessage</div>
         }
 
-        <button class="btn btn-success mb-3" @onclick="() => showCreateForm = !showCreateForm">
+        <button type="button" class="btn btn-success mb-3" @onclick="() => showCreateForm = !showCreateForm">
             @if (showCreateForm) { <span>✕ Cancel</span> } else { <span>+ Add Country</span> }
         </button>
 
@@ -83,13 +83,13 @@
                             <td>
                                 @if (editingCountryId == country.Id)
                                 {
-                                    <button class="btn btn-sm btn-primary me-1" @onclick="SaveCountryEdit">Save</button>
-                                    <button class="btn btn-sm btn-secondary" @onclick="CancelCountryEdit">Cancel</button>
+                                    <button type="button" class="btn btn-sm btn-primary me-1" @onclick="SaveCountryEdit">Save</button>
+                                    <button type="button" class="btn btn-sm btn-secondary" @onclick="CancelCountryEdit">Cancel</button>
                                 }
                                 else
                                 {
-                                    <button class="btn btn-sm btn-warning me-1" @onclick="() => EditCountry(country)">Edit</button>
-                                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteCountry(country.Id)">Delete</button>
+                                    <button type="button" class="btn btn-sm btn-warning me-1" @onclick="() => EditCountry(country)">Edit</button>
+                                    <button type="button" class="btn btn-sm btn-danger" @onclick="() => DeleteCountry(country.Id)">Delete</button>
                                 }
                             </td>
                         </tr>
