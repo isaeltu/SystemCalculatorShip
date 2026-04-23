@@ -10,7 +10,7 @@
                     <h4 class="mb-0">🔒 Admin Login</h4>
                 </div>
                 <div class="card-body">
-                    <EditForm Model="loginRequest" OnValidSubmit="HandleLogin">
+                    <EditForm Model="loginRequest" OnValidSubmit="HandleLogin" FormName="login-form">
                         <DataAnnotationsValidator />
                         <ValidationSummary class="alert alert-danger" />
 

@@ -14,7 +14,7 @@
             <div class="card bg-light mb-3">
                 <div class="card-body">
                     <h6 class="card-title">New Country</h6>
-                    <EditForm Model="newCountry" OnValidSubmit="CreateCountry">
+                    <EditForm Model="newCountry" OnValidSubmit="CreateCountry" FormName="countries-form">
                         <DataAnnotationsValidator />
                         <ValidationSummary class="alert alert-danger" />
 
