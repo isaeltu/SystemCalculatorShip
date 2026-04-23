@@ -1,5 +1,5 @@
 @namespace SystemCalculatorShip.Api.Pages
-@using Application.DTOs
+@using SystemCalculatorShip.Application.DTOs
 @inject HttpClient Http
 
 <div class="card">
@@ -111,7 +111,7 @@
     {
         try
         {
-            if (ApiClient != null && ModelState.IsValid)
+            if (ApiClient != null)
             {
                 var response = await ApiClient.PostAsync<CreateCountryRequest, ApiResponse<CountryDto>>(
                     "/api/countries", newCountry);
@@ -139,7 +139,7 @@
     {
         try
         {
-            if (ApiClient != null && confirm("Are you sure you want to delete this country?"))
+            if (ApiClient != null)
             {
                 await ApiClient.DeleteAsync($"/api/countries/{id}");
                 await LoadCountries();

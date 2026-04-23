@@ -1,9 +1,8 @@
 namespace SystemCalculatorShip.Application.Services;
 
-using DTOs;
-using Entities;
-using Infrastructure.Interfaces;
-using Interfaces;
+using SystemCalculatorShip.Domain.Entities;
+using SystemCalculatorShip.Application.DTOs;
+using SystemCalculatorShip.Application.Interfaces;
 
 /// <summary>
 /// Service for managing countries

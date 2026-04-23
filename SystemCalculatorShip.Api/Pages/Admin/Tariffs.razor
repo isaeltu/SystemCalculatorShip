@@ -1,5 +1,5 @@
 @namespace SystemCalculatorShip.Api.Pages
-@using Application.DTOs
+@using SystemCalculatorShip.Application.DTOs
 @inject HttpClient Http
 
 <div class="card">
@@ -151,7 +151,7 @@
     {
         try
         {
-            if (ApiClient != null && ModelState.IsValid && newTariff.CountryId > 0 && !string.IsNullOrEmpty(newTariff.Type))
+            if (ApiClient != null && newTariff.CountryId > 0 && !string.IsNullOrEmpty(newTariff.Type))
             {
                 var response = await ApiClient.PostAsync<CreateTariffRequest, ApiResponse<TariffDto>>(
                     "/api/tariffs", newTariff);
@@ -179,7 +179,7 @@
     {
         try
         {
-            if (ApiClient != null && confirm("Are you sure you want to delete this tariff?"))
+            if (ApiClient != null)
             {
                 await ApiClient.DeleteAsync($"/api/tariffs/{id}");
                 await LoadTariffs();

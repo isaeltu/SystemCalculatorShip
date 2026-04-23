@@ -1,9 +1,9 @@
 namespace SystemCalculatorShip.Application.Services;
 
-using DTOs;
-using Entities;
-using Interfaces;
-using Domain.Validators;
+using SystemCalculatorShip.Domain.Entities;
+using SystemCalculatorShip.Domain.Validators;
+using SystemCalculatorShip.Application.DTOs;
+using SystemCalculatorShip.Application.Interfaces;
 
 /// <summary>
 /// Service for calculating shipping tariffs

@@ -1,7 +1,7 @@
 namespace SystemCalculatorShip.Api.Middleware;
 
-using Application.DTOs;
-using Application.Interfaces;
+using SystemCalculatorShip.Application.DTOs;
+using SystemCalculatorShip.Application.Interfaces;
 using System.Text.Json;
 
 /// <summary>

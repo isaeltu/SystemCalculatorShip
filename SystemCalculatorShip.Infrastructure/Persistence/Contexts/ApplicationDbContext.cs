@@ -1,7 +1,7 @@
 namespace SystemCalculatorShip.Infrastructure.Persistence.Contexts;
 
 using Microsoft.EntityFrameworkCore;
-using Entities;
+using SystemCalculatorShip.Domain.Entities;
 
 /// <summary>
 /// Entity Framework Core DbContext for the application

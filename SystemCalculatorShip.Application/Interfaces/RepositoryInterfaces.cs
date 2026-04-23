@@ -1,6 +1,6 @@
 namespace SystemCalculatorShip.Application.Interfaces;
 
-using Entities;
+using SystemCalculatorShip.Domain.Entities;
 
 /// <summary>
 /// Interface for Country repository

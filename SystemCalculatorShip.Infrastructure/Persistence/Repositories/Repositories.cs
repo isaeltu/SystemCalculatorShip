@@ -1,9 +1,9 @@
 namespace SystemCalculatorShip.Infrastructure.Persistence.Repositories;
 
 using Microsoft.EntityFrameworkCore;
-using Entities;
-using Interfaces;
-using Contexts;
+using SystemCalculatorShip.Domain.Entities;
+using SystemCalculatorShip.Application.Interfaces;
+using SystemCalculatorShip.Infrastructure.Persistence.Contexts;
 
 /// <summary>
 /// Repository implementation for Country entity

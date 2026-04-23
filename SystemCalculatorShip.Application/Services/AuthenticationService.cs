@@ -3,7 +3,7 @@ namespace SystemCalculatorShip.Application.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Interfaces;
+using SystemCalculatorShip.Application.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 
 /// <summary>

@@ -1,8 +1,8 @@
 namespace SystemCalculatorShip.Api.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
-using Application.DTOs;
-using Application.Interfaces;
+using SystemCalculatorShip.Application.DTOs;
+using SystemCalculatorShip.Application.Interfaces;
 
 /// <summary>
 /// Authentication controller for admin login

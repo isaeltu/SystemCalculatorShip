@@ -1,7 +1,7 @@
 namespace SystemCalculatorShip.Application.Interfaces;
 
-using DTOs;
-using Entities;
+using SystemCalculatorShip.Domain.Entities;
+using SystemCalculatorShip.Application.DTOs;
 
 /// <summary>
 /// Interface for authentication service
@@ -54,5 +54,3 @@ public interface ILoggerService
     void Error(string message, Exception? exception = null);
     void Warning(string message);
 }
-
-using Entities;

@@ -2,9 +2,9 @@ namespace SystemCalculatorShip.Api.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Application.DTOs;
-using Application.Interfaces;
-using Entities;
+using SystemCalculatorShip.Application.DTOs;
+using SystemCalculatorShip.Application.Interfaces;
+using SystemCalculatorShip.Domain.Entities;
 
 /// <summary>
 /// Tariffs management controller

@@ -1,6 +1,6 @@
 namespace SystemCalculatorShip.Api.Services;
 
-using Application.DTOs;
+using SystemCalculatorShip.Application.DTOs;
 using System.Net.Http.Headers;
 using System.Text.Json;
 

@@ -1,6 +1,6 @@
 namespace SystemCalculatorShip.Application.Services;
 
-using Interfaces;
+using SystemCalculatorShip.Application.Interfaces;
 
 /// <summary>
 /// Logger service implementation
