@@ -1,0 +1,58 @@
+@page "/admin"
+@using Application.DTOs
+@inject NavigationManager Navigation
+@inject ServiceClient ApiClient
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>📊 Admin Panel</h1>
+        <button class="btn btn-outline-danger" @onclick="Logout">
+            Logout
+        </button>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link @(activeTab == "countries" ? "active" : "")" 
+                            @onclick="() => SetActiveTab("countries")" role="tab">
+                        🌍 Countries
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link @(activeTab == "tariffs" ? "active" : "")" 
+                            @onclick="() => SetActiveTab("tariffs")" role="tab">
+                        💰 Tariffs
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content mt-4">
+                @if (activeTab == "countries")
+                {
+                    <Countries ApiClient="@ApiClient" />
+                }
+                else if (activeTab == "tariffs")
+                {
+                    <Tariffs ApiClient="@ApiClient" />
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string activeTab = "countries";
+
+    private void SetActiveTab(string tab)
+    {
+        activeTab = tab;
+    }
+
+    private async Task Logout()
+    {
+        await ApiClient.ClearTokenAsync();
+        Navigation.NavigateTo("/", forceLoad: true);
+    }
+}

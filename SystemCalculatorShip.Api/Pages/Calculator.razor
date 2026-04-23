@@ -1,0 +1,150 @@
+@page "/calculator"
+@using Application.DTOs
+@inject HttpClient Http
+@inject ServiceClient ApiClient
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">📦 Shipping Cost Calculator</h4>
+                </div>
+                <div class="card-body">
+                    <EditForm Model="calculateRequest" OnValidSubmit="Calculate">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary class="alert alert-danger" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Destination Country</label>
+                            <InputSelect @bind-Value="calculateRequest.CountryCode" class="form-select">
+                                <option value="">-- Select a country --</option>
+                                @foreach (var country in countries)
+                                {
+                                    <option value="@country.Code">@country.Name (@country.Code)</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="() => calculateRequest.CountryCode" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Weight (kg)</label>
+                            <InputNumber @bind-Value="calculateRequest.Weight" class="form-control" placeholder="Enter weight in kilograms" />
+                            <ValidationMessage For="() => calculateRequest.Weight" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Tariff Type</label>
+                            <InputSelect @bind-Value="calculateRequest.TariffType" class="form-select">
+                                <option value="">-- Select tariff type --</option>
+                                <option value="standard">Standard - Regular delivery</option>
+                                <option value="express">Express - Fast delivery</option>
+                                <option value="economy">Economy - Budget delivery</option>
+                                <option value="premium">Premium - Priority delivery</option>
+                            </InputSelect>
+                            <ValidationMessage For="() => calculateRequest.TariffType" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100" disabled="@isCalculating">
+                            @if (isCalculating)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                <span>Calculating...</span>
+                            }
+                            else
+                            {
+                                <span>Calculate Cost</span>
+                            }
+                        </button>
+                    </EditForm>
+
+                    @if (result != null)
+                    {
+                        <div class="alert alert-success mt-4">
+                            <h5 class="alert-heading">✅ Shipping Cost Calculated</h5>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Country:</strong> @result.Country</p>
+                                    <p><strong>Tariff Type:</strong> @result.TariffType</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Weight:</strong> @result.Weight kg</p>
+                                    <p><strong>Rate:</strong> $@result.RatePerKg / kg</p>
+                                </div>
+                            </div>
+                            <hr />
+                            <h4 class="text-success">Total Cost: $@result.TotalCost.ToString("F2")</h4>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger mt-4">
+                            ❌ Error: @errorMessage
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private CalculateShippingRequest calculateRequest = new();
+    private CalculateShippingResponse? result;
+    private List<CountryDto> countries = new();
+    private string errorMessage = string.Empty;
+    private bool isCalculating = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCountries();
+    }
+
+    private async Task LoadCountries()
+    {
+        try
+        {
+            var response = await ApiClient.GetAsync<ApiResponse<IEnumerable<CountryDto>>>("/api/countries");
+            if (response?.Success == true && response.Data != null)
+            {
+                countries = response.Data.ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading countries: {ex.Message}";
+        }
+    }
+
+    private async Task Calculate()
+    {
+        errorMessage = string.Empty;
+        result = null;
+        isCalculating = true;
+
+        try
+        {
+            var response = await ApiClient.PostAsync<CalculateShippingRequest, ApiResponse<CalculateShippingResponse>>(
+                "/api/shipping/calculate", calculateRequest);
+
+            if (response?.Success == true && response.Data != null)
+            {
+                result = response.Data;
+            }
+            else
+            {
+                errorMessage = response?.Message ?? "Failed to calculate shipping cost.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isCalculating = false;
+        }
+    }
+}

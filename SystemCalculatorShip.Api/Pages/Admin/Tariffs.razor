@@ -1,0 +1,193 @@
+@namespace SystemCalculatorShip.Api.Pages
+@using Application.DTOs
+@inject HttpClient Http
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Tariffs Management</h5>
+    </div>
+    <div class="card-body">
+        <button class="btn btn-success mb-3" @onclick="() => showCreateForm = !showCreateForm">
+            @if (showCreateForm) { <span>✕ Cancel</span> } else { <span>+ Add Tariff</span> }
+        </button>
+
+        @if (showCreateForm)
+        {
+            <div class="card bg-light mb-3">
+                <div class="card-body">
+                    <h6 class="card-title">New Tariff</h6>
+                    <EditForm Model="newTariff" OnValidSubmit="CreateTariff">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary class="alert alert-danger" />
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="form-label">Country</label>
+                                <InputSelect @bind-Value="newTariff.CountryId" class="form-select">
+                                    <option value="0">-- Select --</option>
+                                    @foreach (var country in countries)
+                                    {
+                                        <option value="@country.Id">@country.Name</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="() => newTariff.CountryId" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Type</label>
+                                <InputSelect @bind-Value="newTariff.Type" class="form-select">
+                                    <option value="">-- Select --</option>
+                                    <option value="standard">Standard</option>
+                                    <option value="express">Express</option>
+                                    <option value="economy">Economy</option>
+                                    <option value="premium">Premium</option>
+                                </InputSelect>
+                                <ValidationMessage For="() => newTariff.Type" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Rate/Kg ($)</label>
+                                <InputNumber @bind-Value="newTariff.RatePerKg" class="form-control" placeholder="0.00" />
+                                <ValidationMessage For="() => newTariff.RatePerKg" />
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">Add</button>
+                            </div>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        }
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Country</th>
+                        <th>Type</th>
+                        <th>Rate/Kg</th>
+                        <th>Currency</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (tariffs.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">No tariffs found</td>
+                        </tr>
+                    }
+                    @foreach (var tariff in tariffs)
+                    {
+                        <tr>
+                            <td>@tariff.CountryName</td>
+                            <td><span class="badge bg-info">@tariff.Type</span></td>
+                            <td>@tariff.RatePerKg.ToString("F2")</td>
+                            <td>@tariff.Currency</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" @onclick="() => EditTariff(tariff.Id)">Edit</button>
+                                <button class="btn btn-sm btn-danger" @onclick="() => DeleteTariff(tariff.Id)">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ServiceClient? ApiClient { get; set; }
+
+    private List<TariffDto> tariffs = new();
+    private List<CountryDto> countries = new();
+    private CreateTariffRequest newTariff = new();
+    private bool showCreateForm = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCountries();
+        await LoadTariffs();
+    }
+
+    private async Task LoadCountries()
+    {
+        try
+        {
+            if (ApiClient != null)
+            {
+                var response = await ApiClient.GetAsync<ApiResponse<IEnumerable<CountryDto>>>("/api/countries");
+                if (response?.Success == true && response.Data != null)
+                {
+                    countries = response.Data.ToList();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading countries: {ex.Message}");
+        }
+    }
+
+    private async Task LoadTariffs()
+    {
+        try
+        {
+            if (ApiClient != null)
+            {
+                var response = await ApiClient.GetAsync<ApiResponse<IEnumerable<TariffDto>>>("/api/tariffs");
+                if (response?.Success == true && response.Data != null)
+                {
+                    tariffs = response.Data.ToList();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading tariffs: {ex.Message}");
+        }
+    }
+
+    private async Task CreateTariff()
+    {
+        try
+        {
+            if (ApiClient != null && ModelState.IsValid && newTariff.CountryId > 0 && !string.IsNullOrEmpty(newTariff.Type))
+            {
+                var response = await ApiClient.PostAsync<CreateTariffRequest, ApiResponse<TariffDto>>(
+                    "/api/tariffs", newTariff);
+
+                if (response?.Success == true)
+                {
+                    newTariff = new();
+                    showCreateForm = false;
+                    await LoadTariffs();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating tariff: {ex.Message}");
+        }
+    }
+
+    private async Task EditTariff(int id)
+    {
+        // TODO: Implement edit functionality
+    }
+
+    private async Task DeleteTariff(int id)
+    {
+        try
+        {
+            if (ApiClient != null && confirm("Are you sure you want to delete this tariff?"))
+            {
+                await ApiClient.DeleteAsync($"/api/tariffs/{id}");
+                await LoadTariffs();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting tariff: {ex.Message}");
+        }
+    }
+}
